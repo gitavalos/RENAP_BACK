@@ -16,15 +16,6 @@ class RegistroDefuncionController extends BaseController
     */
     public function postDefuncion(Request $request)
     {
-        /*
-            cui
-            cuiCompareciente
-            municipio
-            lugarDefuncion
-            fechaDefuncion
-            causa
-        */
-
         $cui = $request->request->get('cui');
         $cuiCompareciente = $request->request->get('cuiCompareciente');
         $municipio = $request->request->get('municipio');

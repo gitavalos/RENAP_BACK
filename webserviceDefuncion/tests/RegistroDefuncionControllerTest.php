@@ -15,4 +15,5 @@ class RegistroDefuncionControllerTest extends TestCase
 
         $this->assertEquals('-1', $result["status"]);
     }
+    
 }
