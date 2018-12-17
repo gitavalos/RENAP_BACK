@@ -20,8 +20,11 @@ class MatrimonioController extends BaseController
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
         $salida['data'] = array();
-        $matrimonio = array();
+        
         $cui = $request->request->get('cui');
+        return $this->json($this->selectMatrimonio($cui));
+    }
+    public function selectMatrimonio($cui){
         if(isset($cui) ){
             $mysqli = $this->getConexion();
             if ($mysqli->connect_errno) {
@@ -34,6 +37,7 @@ class MatrimonioController extends BaseController
                 ";";
                 if ($mysqli->multi_query($query )) {
                     if ($resultado = $mysqli->use_result()) {
+                        $matrimonio = array();
                         while ($fila = $resultado->fetch_row()) {
                             $tipo = array();
                             $tipo['estado'] = $fila[0];
@@ -62,7 +66,7 @@ class MatrimonioController extends BaseController
         }else {
             $salida['mensaje'] = "no se envio el paramentro";
         }        
-        return $this->json($salida);
+        return ($salida);
     }
     
 
