@@ -127,7 +127,7 @@ class DPIController extends AbstractController {
             $persona['departamento'] = $request->get("departamento");
             $persona['municipio'] = $request->get("municipio");
             $persona['huella'] = $request->get("huella");
-            $salida = updateDPI($persona);
+            $salida = $this->updateDPI($persona);
         }
         return $this->json($salida);
     }
