@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PostControllerTest extends WebTestCase
 {
-    public function testShowPost()
+    public function testRegistrarDefuncion()
     {
         $client = static::createClient();
 
@@ -19,6 +19,16 @@ class PostControllerTest extends WebTestCase
         'causa' => "Muerte Natural"
         );
         $client->request('POST', '/sa/registrarDefuncion', $data);
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+
+    public function testStatusConsultarDefuncion()
+    {
+        $client = static::createClient();
+
+        $data = array('cui' => "1000000100108");
+        $client->request('POST', '/sa/consultarDefuncion', $data);
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
@@ -46,5 +56,15 @@ class PostControllerTest extends WebTestCase
         }
 
         $this->assertEquals($cui, $cuiResponse);
+    }
+
+    public function testErrorStatusConsultarDefuncion()
+    {
+        $client = static::createClient();
+
+        $data = array('cui' => "1000000100108");
+        $client->request('POST', '/sa/consultarDefuncion', $data);
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 }
