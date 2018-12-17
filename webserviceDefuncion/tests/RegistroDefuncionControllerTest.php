@@ -25,4 +25,22 @@ class RegistroDefuncionControllerTest extends TestCase
         $this->assertEquals('-1', $result["status"]);
     }
 
+    public function testConsultarDefuncion()
+    {
+        $registroDefuncion = new RegistroDefuncionController();
+        $cui = "1000000100108";
+        $cuiResponse = "";
+
+        $result = $registroDefuncion->consultarDefuncion($cui);
+        
+        if($result["status"]=='1'){
+            if(count($result["data"])==1){
+                $dataResult = $result["data"];
+                $datosDefuncion = $dataResult[0];
+                $cuiResponse = $datosDefuncion["cui"];
+            }
+        }
+        
+        $this->assertEquals($cui, $cuiResponse);
+    }
 }
