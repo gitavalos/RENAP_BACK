@@ -65,6 +65,6 @@ class PostControllerTest extends WebTestCase
         $data = array('cui' => "1000000100108");
         $client->request('POST', '/sa/consultarDefuncion', $data);
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
     }
 }
