@@ -27,14 +27,24 @@ class PostControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
+        $cui = "1000001182207";
+        $cuiResponse = "";
+
         $client->request(
             'POST',
             '/sa/consultarDefuncion',
-            array('cui' => '1000000100108')
+            array('cui' => $cui)
         );
 
         $result = json_decode($client->getResponse()->getContent());
-        $stringResult = '{"status":"1","mensaje":"OK","data":[{"cui":"1000000100108","cuiCompareciente":"1000159051205","fechaDefuncion":"2006-04-02 14:25:56","causa":"causas naturales","colegiado_medico":null,"nombre_medico":null,"lugarDefuncion":"2006"}]}';
-        $this->assertEquals($stringResult, json_encode($result));
+        if($result->status=='1'){
+            if(count($result->data)==1){
+                $dataResult = $result->data;
+                $datosDefuncion = $dataResult[0];
+                $cuiResponse = $datosDefuncion->cui;
+            }
+        }
+
+        $this->assertEquals($cui, $cuiResponse);
     }
 }
