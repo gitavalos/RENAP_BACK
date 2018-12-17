@@ -25,12 +25,6 @@ class RegistroDefuncionController extends BaseController
             causa
         */
 
-        $salida = array();
-		$salida['status'] = "-1";
-        $salida['mensaje'] = "fail";
-        $salida['data'] = array();
-        $departamentos = array();
-
         $cui = $request->request->get('cui');
         $cuiCompareciente = $request->request->get('cuiCompareciente');
         $municipio = $request->request->get('municipio');
@@ -38,16 +32,47 @@ class RegistroDefuncionController extends BaseController
         $fechaDefuncion = $request->request->get('fechaDefuncion');
         $causa = $request->request->get('causa');
 
+         
+        return $this->registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa);
+
+    }
+
+    public function registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, 
+                                        $fechaDefuncion, $causa)
+    {
+
+        $salida = array();
+		$salida['status'] = "-1";
+        $salida['mensaje'] = "fail";
+        $salida['data'] = array();
+        $departamentos = array();
+
         if(isset($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa) ){
             $mysqli = $this->getConexion();
             if ($mysqli->connect_errno) {
                 $salida['mensaje'] = "error de conexion";
             } else {
                 //verificar cui
-                $query = "SELECT cui FROM persona WHERE cui LIKE '".$cui."';";
-
-                if ($mysqli->multi_query($query )) {
-                    if ($resultado = $mysqli->use_result()) {
+                $query = 
+                "INSERT INTO `SA2018`.`defuncion`
+                (`fechaDefuncion`,
+                `causa`,
+                `cui`,
+                `lugarDefuncion`,
+                `cuiCompareciente`)
+                VALUES
+                ('$fechaDefuncion',
+                '$causa',
+                '$cui',
+                '$lugarDefuncion',
+                '$cuiCompareciente');
+                ";
+                $resultado =$mysqli->query($query);
+                var_dump($resultado);
+                die;
+                /*
+                if (TRUE == TRUE) {
+                    if ($resultado->) {
                         while ($fila = $resultado->fetch_row()) {
                             $tipo = array();
                             $tipo['cui'] = $fila[0];
@@ -63,59 +88,14 @@ class RegistroDefuncionController extends BaseController
                 } else {
                     $salida['mensaje'] = "error de consulta";
                 }
+                */
                 $mysqli->close();
             }    
         }else {
             $salida['mensaje'] = "no se envio el paramentro";
         }        
         return $this->json($salida);
-
-        /*
-        $salida = array();
-		$salida['status'] = "-1";
-        $salida['mensaje'] = "fail";
-        $salida['data'] = array();
-        $departamentos = array();
-        $pais = $request->request->get('pais');
-        if(isset($pais) ){
-            $mysqli = $this->getConexion();
-            if ($mysqli->connect_errno) {
-                $salida['mensaje'] = "error de conexion";
-            } else {
-                $query = "select l.idlugar, l.nombre from ".
-                "lugar l " . 
-                "inner join lugar lp " .
-                "    on l.padre = lp.idlugar " .
-                "where l.idtipo_lugar = 1 " .
-                " and lp.idlugar = " . $pais . 
-                ";";
-                if ($mysqli->multi_query($query )) {
-                    if ($resultado = $mysqli->use_result()) {
-                        while ($fila = $resultado->fetch_row()) {
-                            $tipo = array();
-                            $tipo['codigo'] = $fila[0];
-                            $tipo['nombre'] = $fila[1];
-                            array_push($departamentos, $tipo);
-                        }
-                        $resultado->close();
-
-                        $salida['status'] = "1";
-                        $salida['mensaje'] = "OK";
-                        $salida['data'] = $departamentos;
-                    }
-                } else {
-                    $salida['mensaje'] = "error de consulta";
-                }
-                $mysqli->close();
-            }    
-        }else {
-            $salida['mensaje'] = "no se envio el paramentro";
-        }
-        */
-        
-
     }
-
 }
 
 
