@@ -1,18 +1,14 @@
 <?php
 
-namespace App\Tests\Util;
+namespace App\Tests;
 
-use App\Util\Calculator;
+use App\Controller\RegistroDefuncionController;
 use PHPUnit\Framework\TestCase;
 
-class CalculatorTest extends TestCase
+class RegistroDefuncionControllerTest extends TestCase
 {
-    public function testAdd()
+    public function testRegistroDefuncion()
     {
-        $calculator = new Calculator();
-        $result = $calculator->add(30, 12);
-
-        // assert that your calculator added the numbers correctly!
-        $this->assertEquals(42, $result);
+        
     }
 }

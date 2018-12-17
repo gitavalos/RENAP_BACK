@@ -33,8 +33,8 @@ class RegistroDefuncionController extends BaseController
         $causa = $request->request->get('causa');
 
          
-        return $this->registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa);
-
+        $result = $this->registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa);
+        return $this->json($result);
     }
 
     public function registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, 
@@ -44,17 +44,13 @@ class RegistroDefuncionController extends BaseController
         $salida = array();
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
-        $salida['data'] = array();
-        $departamentos = array();
 
         if(isset($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa) ){
             $mysqli = $this->getConexion();
             if ($mysqli->connect_errno) {
                 $salida['mensaje'] = "error de conexion";
             } else {
-                //verificar cui
-                $query = 
-                "INSERT INTO `SA2018`.`defuncion`
+                $query = "INSERT INTO `SA2018`.`defuncion`
                 (`fechaDefuncion`,
                 `causa`,
                 `cui`,
@@ -64,37 +60,24 @@ class RegistroDefuncionController extends BaseController
                 ('$fechaDefuncion',
                 '$causa',
                 '$cui',
-                '$lugarDefuncion',
+                $municipio,
                 '$cuiCompareciente');
                 ";
                 $resultado =$mysqli->query($query);
-                var_dump($resultado);
-                die;
-                /*
-                if (TRUE == TRUE) {
-                    if ($resultado->) {
-                        while ($fila = $resultado->fetch_row()) {
-                            $tipo = array();
-                            $tipo['cui'] = $fila[0];
-                            array_push($departamentos, $tipo);
-                        }
-                        
-                        $resultado->close();
 
+                if ($resultado == TRUE) {
                         $salida['status'] = "1";
                         $salida['mensaje'] = "OK";
-                        $salida['data'] = $departamentos;
-                    }
                 } else {
                     $salida['mensaje'] = "error de consulta";
                 }
-                */
+
                 $mysqli->close();
             }    
         }else {
-            $salida['mensaje'] = "no se envio el paramentro";
+            $salida['mensaje'] = "no se enviaron los parametros necesarios";
         }        
-        return $this->json($salida);
+        return $salida;
     }
 }
 
