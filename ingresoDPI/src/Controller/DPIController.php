@@ -31,9 +31,9 @@ class DPIController extends AbstractController {
     }
 
     /**
-     * @Route("/consultaDPI", name="consultaCui")
+     * @Route("/consultarDPI", name="consultarDPI")
      */
-    public function consultaCui(Request $request) {
+    public function consultarDPI(Request $request) {
         $cuiBuscado = $fila = $request->get("cui");
         $arrResult = $this->getInfoDPI($cuiBuscado);
 
@@ -52,11 +52,12 @@ class DPIController extends AbstractController {
         }
         if (strlen($cond) > 13) {
             $salida['mensaje'] = "el numero de CUI es mayor a lo esperado";
-            return $salida;
         }
         $mysqli = $this->getConexion();
 
-
+        if (!$request->isMethod('get')) {
+            return $salida;
+        }
         if ($mysqli->connect_errno) {
             $salida['mensaje'] = "error de conexion";
         } else {
@@ -109,9 +110,9 @@ class DPIController extends AbstractController {
     }
 
     /**
-     * @Route("/ingresoDPI", name="ingresoDpi")
+     * @Route("/actualizarDPI", name="actualizarDPI")
      */
-    public function ingresoDpi(Request $request) {
+    public function actualizarDPI(Request $request) {
 
 
         $salida = array();
@@ -119,14 +120,15 @@ class DPIController extends AbstractController {
         $salida['mensaje'] = "fail";
 
 
-        $mysqli = $this->getConexion();
-        if ($request->getMethod('POST')) {
+
+        if ($request->isMethod('POST')) {
             $persona = array();
             $persona['cui'] = $request->get("cui");
             $persona['pais'] = $request->get("pais");
             $persona['departamento'] = $request->get("departamento");
             $persona['municipio'] = $request->get("municipio");
             $persona['huella'] = $request->get("huella");
+            $persona['residencia'] = $request->get("residencia");
             $salida = $this->updateDPI($persona);
         }
         return $this->json($salida);
@@ -138,18 +140,47 @@ class DPIController extends AbstractController {
         $salida['mensaje'] = "fail";
         $salida['data'] = array();
         if (strlen($arrObj["cui"]) < 13) {
-            $salida['mensaje'] = "el numero de CUI es menor a lo esperado";
+            $salida['mensaje'] = "el numero de CUI tiene menos digitos de lo esperado";
             return $salida;
         }
         if (strlen($arrObj["cui"]) > 13) {
-            $salida['mensaje'] = "el numero de CUI es mayor a lo esperado";
+            $salida['mensaje'] = "el numero de CUI tien mas digitos de lo esperado";
             return $salida;
         }
-        if (count($arrObj["cui"]) == 5) {
+        $mysqli = $this->getConexion();
+        //mysqli_query
+        $query = "UPDATE persona";
+        $query .= "SET lugarVecindad = '{$arrObj["municipio"]}'";
+        $query .= ", direccion = '{$arrObj["residencia"]}'";
+        if ($arrObj["huella"] != "") {
+            $query .= ", huella = '{$arrObj["huella"]}'";
+        }
+        $query .= "WHERE cui = '{$arrObj['cui']}'";
+        if ($mysqli->query($query)) {
             $salida['status'] = "1";
             $salida['mensaje'] = "OK";
+        } else {
+            $salida['mensaje'] .= " error update";
         }
+        $mysqli->close();
         return $salida;
     }
-
+    //INSERT INTO persona 
+    //(`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`, `fechaVencimiento`, `lugarVecindad`, `estadoCivil`) 
+    //VALUES ('1', '1', '1', '1', '1', '1', '1', '1', '1', '1');
+    
+    
+    
+    
+    
+    
+    /**
+     * @Route("/registrarNacimiento", name="registrarNacimiento")
+     */
+    public function registrarNacimiento() {
+        return $this->json([
+                    'message' => 'Welcome to your new controller!',
+                    'path' => 'src/Controller/DPIController.php',
+        ]);
+    }
 }
