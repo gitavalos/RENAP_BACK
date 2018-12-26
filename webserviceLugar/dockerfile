@@ -6,7 +6,8 @@ RUN mkdir -p /var/www
 COPY . /var/www
 RUN chmod +x /var/www/bin/console
 WORKDIR /var/www
-CMD [ "php","/var/www/bin/console","server:run","0.0.0.0:80" ]
+CMD [ "php","/var/www/bin/console","server:run","0.0.0.0:80" ] 
+ 
 
 
 
