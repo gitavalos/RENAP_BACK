@@ -1,0 +1,4 @@
+FROM gcr.io/cloudsql-docker/gce-proxy:1.11
+COPY . /secrets/cloudsql
+CMD /cloud_sql_proxy --dir=/cloudsql -instances=zeta-antenna-203623:us-central1:dbsadic2018=tcp:0.0.0.0:3306 -credential_file=/secrets/cloudsql/key.json
+
