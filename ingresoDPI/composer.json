@@ -6,6 +6,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "sensio/framework-extra-bundle": "^5.2",
+        "symfony/apache-pack": "^1.0",
         "symfony/console": "4.2.*",
         "symfony/dotenv": "4.2.*",
         "symfony/flex": "^1.1",
@@ -59,6 +60,7 @@
         }
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "4.2.*"
+        "symfony/phpunit-bridge": "4.2.*",
+        "symfony/web-server-bundle": "4.2.*"
     }
 }
