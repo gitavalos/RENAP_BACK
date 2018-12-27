@@ -117,27 +117,27 @@ class MatrimonioController extends BaseController
     */
     public function registrarMatrimonio(Request $request)
     {    
-        $cuiEsposo = $request->request->get('cuiesposo');
-        $cuiEsposa = $request->request->get('cuiesposa');
+        $cuiHombre = $request->request->get('cuihombre');
+        $cuiMujer = $request->request->get('cuimujer');
         $municipio = $request->request->get('municipio');
-        $direccion = $request->request->get('direccion');
-        $regimen = $request->request->get('regimenmatrimonial');
-        $fecha = $request->request->get('fecha');
+        $lugarMatrimonio = $request->request->get('lugarmatrimonio');
+        $regimenMatrimonial = $request->request->get('regimenmatrimonial');
+        $fechaMatrimonio = $request->request->get('fechamatrimonio');
 
-        $salida = $this->insertarMatrimonio($cuiEsposo, $cuiEsposa, $municipio, $direccion, $fecha, $regimen);
+        $salida = $this->insertarMatrimonio($cuiHombre, $cuiMujer, $municipio, $lugarMatrimonio, $fechaMatrimonio, $regimenMatrimonial);
 
-        
+
         return $this->json($salida);
     }
     
-    public function insertarMatrimonio($cuiEsposo, $cuiEsposa, $municipio, $direccion, $fecha, $regimen)
+    public function insertarMatrimonio($cuiHombre, $cuiMujer, $municipio, $lugarMatrimonio, $fechaMatrimonio, $regimenMatrimonial)
     {
         $salida = array();
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
         $salida['data'] = array();
 
-        if(isset($cuiEsposo, $cuiEsposa, $municipio, $direccion, $fecha, $regimen)){
+        //if(isset($cuiHombre, $cuiMujer, $municipio, $lugarMatrimonio, $fechaMatrimonio, $regimenMatrimonial)){
             $mysqli = $this->getConexion();
             if ($mysqli->connect_errno) {
                 $salida['mensaje'] = "error de conexion";
@@ -152,13 +152,13 @@ class MatrimonioController extends BaseController
                 regimenMatrimonial)
                 VALUES
                 (1,
-                '$cuiEsposo',
-                '$cuiEsposa',
+                '$cuiHombre',
+                '$cuiMujer',
                 $municipio,
-                'mi casa',
-                '$fecha',
-                '$regimen');";
-
+                '$lugarMatrimonio',
+                '$fechaMatrimonio',
+                '$regimenMatrimonial');";
+                error_log($consulta);
                 if ($resultado = $mysqli->query($consulta)) {
                     error_log("echo");
                     if($resultado){
@@ -173,9 +173,9 @@ class MatrimonioController extends BaseController
                 }
                 $mysqli->close();
             }
-        }else{
-            $salida['mensaje'] = "parametros incorrectos";
-        }
+        //}else{
+        //    $salida['mensaje'] = "parametros incorrectos";
+        //}
 
         return ($salida);
     }
