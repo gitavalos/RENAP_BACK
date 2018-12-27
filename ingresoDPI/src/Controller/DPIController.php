@@ -106,6 +106,53 @@ class DPIController extends AbstractController {
             } else {
                 $salida['mensaje'] = "error de consulta";
             }
+			$queryPadres = "select pa.cuiPadre, p.nombre, p.apellido,p.fechaNacimiento,pais.nombre as Pais,departamento.nombre as departamento, municipio.nombre as municipio ,pa.idtipo_padre
+							from lugar pais
+								left join lugar departamento
+								on pais.idlugar= departamento.padre
+								left join lugar municipio
+								on departamento.idlugar = municipio.padre
+								inner join persona p
+								on p.lugarNacimiento = municipio.idlugar
+								inner join padre pa
+								on pa.cuiPadre = p.cui
+								where
+								pa.hijo = '{$cond}'
+							";
+							
+			if ($mysqli->multi_query($queryPadres)) {
+                if ($resultado = $mysqli->use_result()) {
+                    while ($fila = $resultado->fetch_row()) {
+						
+						if($fila[7] == 1){
+							$data['cuiPadre'] = $fila[0];
+							$data['nombrePadre'] = $fila[1];
+							$data['apellidoPadre'] = $fila[2];
+							$data['fechaNacimientoPadre'] = $fila[3];
+							$data['paisPadre'] = $fila[4];
+							$data['departamentoPadre'] = $fila[5];
+							$data['municipioPadre'] = $fila[6];
+						}else if($fila[7] == 2){
+							$data['cuiMadre'] = $fila[0];
+							$data['nombreMadre'] = $fila[1];
+							$data['apellidoMadre'] = $fila[2];
+							$data['fechaNacimientoMadre'] = $fila[3];
+							$data['paisMadre'] = $fila[4];
+							$data['departamentoMadre'] = $fila[5];
+							$data['municipioMadre'] = $fila[6];
+						}
+                        
+                    }
+                    $resultado->close();
+
+                    $salida['status'] = "2";
+                    $salida['mensaje'] = "OK";
+                    $salida['data'] = $data;
+                }
+            } else {
+                $salida['mensaje'] = "error de consulta";
+            }				
+			
             $mysqli->close();
         }
         return $salida;
