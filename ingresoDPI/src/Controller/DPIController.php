@@ -8,9 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DPIController extends AbstractController {
 
-    const NOMBRE_SERVIDOR = "35.193.84.232";
-    const USUARIO_DB = "SAuser";
-    const PASSWORD_DB = "SAuser2018";
+    const NOMBRE_SERVIDOR = "35.208.97.204";
+    const USUARIO_DB = "root";
+    const PASSWORD_DB = "EVcj+4BQ";
     const NOMBRE_DB = "SA2018";
 
     public function getConexion() {
@@ -36,7 +36,11 @@ class DPIController extends AbstractController {
     public function consultarDPI(Request $request) {
         $cuiBuscado = $fila = $request->get("cui");
         $arrResult = $this->getInfoDPI($cuiBuscado);
-
+        if (!$request->isMethod('get')) {
+            $arrResult = array();
+            $arrResult['status'] = "-1";
+            $arrResult['mensaje'] = "fail";
+        }
         return $this->json($arrResult);
     }
 
@@ -55,9 +59,7 @@ class DPIController extends AbstractController {
         }
         $mysqli = $this->getConexion();
 
-        if (!$request->isMethod('get')) {
-            return $salida;
-        }
+
         if ($mysqli->connect_errno) {
             $salida['mensaje'] = "error de conexion";
         } else {
@@ -119,8 +121,6 @@ class DPIController extends AbstractController {
         $salida['status'] = "-1";
         $salida['mensaje'] = "fail";
 
-
-
         if ($request->isMethod('POST')) {
             $persona = array();
             $persona['cui'] = $request->get("cui");
@@ -165,22 +165,190 @@ class DPIController extends AbstractController {
         $mysqli->close();
         return $salida;
     }
+
     //INSERT INTO persona 
     //(`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`, `fechaVencimiento`, `lugarVecindad`, `estadoCivil`) 
     //VALUES ('1', '1', '1', '1', '1', '1', '1', '1', '1', '1');
-    
-    
-    
-    
-    
-    
+
+
+    private function generarDpi($inicial) {
+        $dpi = 0;
+        $i = 0;
+
+        $entrada = $inicial;
+        $numero = $inicial;
+        $contador = 9;
+        $resul = 0;
+        while ($numero > 0) {
+            $resul = $resul + $numero % 10 * $contador;
+            $numero = $numero / 10;
+            $contador--;
+        }
+        $sal = (string) $entrada . ($resul % 11);
+        if ($resul % 11 < 10) {
+            $dpi = $sal;
+            $i++;
+        }
+
+        return $dpi;
+    }
+
     /**
      * @Route("/registrarNacimiento", name="registrarNacimiento")
      */
-    public function registrarNacimiento() {
-        return $this->json([
-                    'message' => 'Welcome to your new controller!',
-                    'path' => 'src/Controller/DPIController.php',
-        ]);
+    public function registrarNacimiento(Request $request) {
+        $salida = array();
+        $salida['status'] = "-1";
+        $salida['mensaje'] = "fail";
+
+        //$this->generarDpi(10000004);
+        $mysqli = $this->getConexion();
+        $consulta = "SELECT max(cui) FROM persona";
+        $ultimoDPI = "";
+        $it = 0;
+        if ($mysqli->multi_query($consulta)) {
+            if ($resultado = $mysqli->use_result()) {
+                while ($fila = $resultado->fetch_row()) {
+                    $it += 1;
+                    $ultimoDPI = $fila[0];
+                }
+                $resultado->close();
+            }
+        } else {
+            
+        }
+        if ($it != 1) {
+            $salida['mensaje'] .= " error en duplicidad de numeros de dpi";
+            return $this->json($salida);
+        }
+
+        $originalDate = $request->get("fechaNacimiento");
+        $fecha = date("Y/m/d", strtotime($originalDate));
+
+        $ultimoDPI = substr($ultimoDPI, 0, -5);
+        $ultimoDPI1 = $this->generarDpi(intval($ultimoDPI) + 1) . $request->get("lugarNacimiento");
+        $query = "INSERT INTO persona 
+            (`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`
+            , `fechaVencimiento`, `lugarVecindad`,`direccion`, `estadoCivil`) 
+            VALUES ('{$ultimoDPI1}'"
+                . ", '{$request->get("nombre")}'"
+                . ", '{$request->get("apellido")}'"
+                . ", '{$fecha}'"
+                . ", '{$request->get("genero")}'"
+                . ", '{$request->get("lugarNacimiento")}'"
+                . ", NULL"
+                . ", NULL"
+                . ", '{$request->get("lugarNacimiento")}'"
+                . ", '{$request->get("direccion")}'"
+                . ", 'SOLTERO')";
+        if ($mysqli->query($query)) {
+            $salida['status'] = "1";
+            $salida['mensaje'] = "OK";
+        } else {
+            $salida['mensaje'] .= " error INSERT " . $mysqli->error . "|" . $query . "|";
+        }
+
+        if ($request->get("cuiPadre") != "") {
+            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('1', '{$request->get("cuiPadre")}', '{$ultimoDPI1}')";
+            if ($mysqli->query($query)) {
+                $salida['status'] = "1";
+                $salida['mensaje'] = "OK";
+            } else {
+                $salida['mensaje'] .= " error INSERT " . $mysqli->error . "|" . $query . "|";
+            }
+        }
+        if ($request->get("cuiMadre")!= "") {
+            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('2', '{$request->get("cuiMadre")}', '{$ultimoDPI1}')";
+            if ($mysqli->query($query)) {
+                $salida['status'] = "1";
+                $salida['mensaje'] = "OK";
+            } else {
+                $salida['mensaje'] .= " error INSERT " . $mysqli->error . "|" . $query . "|";
+            }
+        }
+
+
+        $mysqli->close();
+
+        return $this->json($salida);
     }
+
+    /**
+     * @Route("/getDepartamentos", name="getDepartamentos")
+     */
+    public function getDepartamentos(Request $request) {
+        $salida = array();
+        $salida['status'] = "-1";
+        $salida['mensaje'] = "fail";
+        $salida['data'] = array();
+        $data = array();
+        $mysqli = $this->getConexion();
+
+
+        if ($mysqli->connect_errno) {
+            $salida['mensaje'] = "error de conexion";
+        } else {
+            $consulta = "SELECT * FROM lugar where idtipo_lugar = 2";
+            if ($mysqli->multi_query($consulta)) {
+                if ($resultado = $mysqli->use_result()) {
+                    while ($fila = $resultado->fetch_row()) {
+                        $departamento = array();
+                        $departamento['idlugar'] = $fila[0];
+                        $departamento['nombre'] = $fila[1];
+
+                        array_push($data, $departamento);
+                    }
+                    $resultado->close();
+
+                    $salida['status'] = "1";
+                    $salida['mensaje'] = "OK";
+                    $salida['data'] = $data;
+                }
+            } else {
+                $salida['mensaje'] = "error de consulta";
+            }
+            $mysqli->close();
+        }
+        return $this->json($salida);
+    }
+
+    /**
+     * @Route("/getMunicipios", name="getMunicipios")
+     */
+    public function getMunicipios(Request $request) {
+        $salida = array();
+        $salida['status'] = "-1";
+        $salida['mensaje'] = "fail";
+        $salida['data'] = array();
+        $data = array();
+        $mysqli = $this->getConexion();
+
+
+        if ($mysqli->connect_errno) {
+            $salida['mensaje'] = "error de conexion";
+        } else {
+            $consulta = "select * from lugar where padre = {$request->get("departamento")}";
+            if ($mysqli->multi_query($consulta)) {
+                if ($resultado = $mysqli->use_result()) {
+                    while ($fila = $resultado->fetch_row()) {
+                        $municipio = array();
+                        $municipio['idlugar'] = $fila[0];
+                        $municipio['nombre'] = $fila[1];
+
+                        array_push($data, $municipio);
+                    }
+                    $resultado->close();
+
+                    $salida['status'] = "1";
+                    $salida['mensaje'] = "OK";
+                    $salida['data'] = $data;
+                }
+            } else {
+                $salida['mensaje'] = "error de consulta";
+            }
+            $mysqli->close();
+        }
+        return $this->json($salida);
+    }
+
 }
