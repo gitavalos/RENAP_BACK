@@ -94,18 +94,88 @@ class RegistroDefuncionController extends BaseController
             if ($mysqli->connect_errno) {
                 $salida['mensaje'] = "error de conexion";
             } else {
-                $query = "SELECT cui, cuiCompareciente, fechaDefuncion, causa, colegiado_medico, nombre_medico, lugarDefuncion FROM defuncion WHERE cui like '$cui';";
+                //$query = "SELECT cui, cuiCompareciente, fechaDefuncion, causa, colegiado_medico, nombre_medico, lugarDefuncion FROM defuncion WHERE cui like '$cui';";
+
+                $query = "
+                            SELECT def.cui, 
+                                    per.nombre, 
+                                    per.apellido, 
+                                    per.genero,
+                                    per.fechaNacimiento, 
+                                    lugpais.nombre as pais, 
+                                    lugdepto.nombre as depto, 
+                                    lugmun.nombre as mun, 
+                                    per.lugarNacimiento,
+                                    per.estadoCivil,
+                                    '' as nombreConyugue,
+                                    '' as apellidoConyugue,
+                                    def.cuiCompareciente, 
+                                    percomp.nombre as nombrecompareciente, 
+                                    percomp.apellido as apellidocompareciente,
+                                    lugcomppais.nombre as paiscompareciente, 
+                                    lugcompdepto.nombre as deptocompareciente,  
+                                    lugcompmun.nombre as muncompareciente,
+                                    percomp.direccion as recidenciacompareciente,
+                                    lugdefpais.nombre as paisdefuncion, 
+                                    lugdefdepto.nombre as deptodefuncion,
+                                    def.direccion,
+                                    def.fechaDefuncion,
+                                    def.causa
+                            FROM defuncion AS def
+                            INNER JOIN persona AS per
+                            ON def.cui like per.cui
+                            INNER JOIN lugar AS lugmun
+                            ON per.lugarNacimiento = lugmun.idlugar
+                            INNER JOIN lugar AS lugdepto
+                            ON lugmun.padre = lugdepto.idlugar
+                            INNER JOIN lugar AS lugpais
+                            ON lugdepto.padre = lugpais.idlugar
+                            INNER JOIN persona AS percomp
+                            ON def.cuicompareciente like percomp.cui
+                            INNER JOIN lugar AS lugcompmun
+                            ON percomp.lugarNacimiento = lugcompmun.idlugar
+                            INNER JOIN lugar AS lugcompdepto
+                            ON lugcompmun.padre = lugcompdepto.idlugar
+                            INNER JOIN lugar AS lugcomppais
+                            ON lugcompdepto.padre = lugcomppais.idlugar
+                            INNER JOIN lugar AS lugdefmun
+                            ON def.lugarDefuncion = lugdefmun.idlugar
+                            INNER JOIN lugar as lugdefdepto
+                            ON lugdefmun.padre = lugdefdepto.idlugar
+                            INNER JOIN lugar as lugdefpais
+                            ON lugdefdepto.padre = lugdefpais.idlugar
+                            WHERE def.cui like '$cui'
+                            ;
+                ";
+
                 if ($mysqli->multi_query($query)) {
                     if ($resultado = $mysqli->use_result()) {
                         while ($fila = $resultado->fetch_row()) {
                             $defuncion = array();
                             $defuncion['cui'] = $fila[0];
-                            $defuncion['cuiCompareciente'] = $fila[1];
-                            $defuncion['fechaDefuncion'] = $fila[2];
-                            $defuncion['causa'] = $fila[3];
-                            $defuncion['colegiado_medico'] = $fila[4];
-                            $defuncion['nombre_medico'] = $fila[5];
-                            $defuncion['lugarDefuncion'] = $fila[6];
+                            $defuncion['nombre'] = $fila[1];
+                            $defuncion['apellido'] = $fila[2];
+                            $defuncion['genero'] = $fila[3];
+                            $defuncion['fechaNacimiento'] = $fila[4];
+                            $defuncion['pais'] = $fila[5];
+                            $defuncion['departamento'] = $fila[6];
+                            $defuncion['municipio'] = $fila[7];
+                            $defuncion['lugarNacimiento'] = $fila[8];
+                            $defuncion['estadoCivil'] = $fila[9];
+                            $defuncion['nombreConyugue'] = $fila[10];
+                            $defuncion['apellidoConyugue'] = $fila[11];
+                            $defuncion['cuiCompareciente'] = $fila[12];
+                            $defuncion['nombreCompareciente'] = $fila[13];
+                            $defuncion['apellidoCompareciente'] = $fila[14];
+                            $defuncion['paisCompareciente'] = $fila[15];
+                            $defuncion['departamentoCompareciente'] = $fila[16];
+                            $defuncion['municipioCompareciente'] = $fila[17];
+                            $defuncion['recidenciaCompareciente'] = $fila[18];
+                            $defuncion['paisDefuncion'] = $fila[19];
+                            $defuncion['departamentoDefuncion'] = $fila[20];
+                            $defuncion['lugarDefuncion'] = $fila[21];
+                            $defuncion['fechaDefuncion'] = $fila[22];
+                            $defuncion['causa'] = $fila[23];
 
                             array_push($defunciones, $defuncion);
                         }
