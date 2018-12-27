@@ -121,10 +121,11 @@ class MatrimonioController extends BaseController
         $cuiEsposa = $request->request->get('cuiesposa');
         $municipio = $request->request->get('municipio');
         $direccion = $request->request->get('direccion');
+        $regimen = $request->request->get('regimenmatrimonial');
         $fecha = $request->request->get('fecha');
-        $regimen = $request->request->get('cuiesposo');
 
         $salida = $this->insertarMatrimonio($cuiEsposo, $cuiEsposa, $municipio, $direccion, $fecha, $regimen);
+
         
         return $this->json($salida);
     }
@@ -160,6 +161,13 @@ class MatrimonioController extends BaseController
 
                 if ($resultado = $mysqli->query($consulta)) {
                     error_log("echo");
+                    if($resultado){
+                        $salida['status'] = "1";
+                        $salida['mensaje'] = "OK";
+                        $salida['data'] = array();             
+                    }else{
+                        $salida['mensaje'] = "no se puede registrar el matrimonio";
+                    }
                 }else{
                     $salida['mensaje'] = "error de consulta";
                 }
@@ -167,16 +175,6 @@ class MatrimonioController extends BaseController
             }
         }else{
             $salida['mensaje'] = "parametros incorrectos";
-        }
-
-        if( $this->verificar($cuiEsposo, $cuiEsposa)){
-            $salida['status'] = "1";
-            $salida['mensaje'] = "OK";
-            $salida['data'] = array();
-            error_log("entro verificar");
-        }else{
-            error_log("entro no");
-            $salida['mensaje'] = "no se puede registrar el matrimonio";    
         }
 
         return ($salida);
