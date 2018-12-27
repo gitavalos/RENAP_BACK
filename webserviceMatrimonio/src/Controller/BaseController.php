@@ -10,9 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BaseController extends AbstractController
 {
-    const NOMBRE_SERVIDOR = "35.193.84.232";
-    const USUARIO_DB = "SAuser";
-	const PASSWORD_DB = "SAuser2018";
+    const NOMBRE_SERVIDOR = "35.208.97.204";//35.227.104.139//
+    const USUARIO_DB = "root";
+	const PASSWORD_DB = "EVcj+4BQ";
     const NOMBRE_DB = "SA2018";
 
     public function getConexion(){
