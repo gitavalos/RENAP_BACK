@@ -226,11 +226,11 @@ class DPIController extends AbstractController {
         $fecha = date("Y/m/d", strtotime($originalDate));
 
         $ultimoDPI = substr($ultimoDPI, 0, -5);
-        $ultimoDPI1 = $this->generarDpi(intval($ultimoDPI) + 1) . $request->get("lugarNacimiento");
+        $DPICreado = $this->generarDpi(intval($ultimoDPI) + 1) . $request->get("lugarNacimiento");
         $query = "INSERT INTO persona 
             (`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`
             , `fechaVencimiento`, `lugarVecindad`,`direccion`, `estadoCivil`) 
-            VALUES ('{$ultimoDPI1}'"
+            VALUES ('{$DPICreado}'"
                 . ", '{$request->get("nombre")}'"
                 . ", '{$request->get("apellido")}'"
                 . ", '{$fecha}'"
@@ -245,25 +245,25 @@ class DPIController extends AbstractController {
             $salida['status'] = "1";
             $salida['mensaje'] = "OK";
         } else {
-            $salida['mensaje'] .= " error INSERT " . $mysqli->error . "|" . $query . "|";
+            $salida['mensaje'] .= " error INSERT PERSONA" . $mysqli->error . "|" . $query . "|";
         }
 
         if ($request->get("cuiPadre") != "") {
-            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('1', '{$request->get("cuiPadre")}', '{$ultimoDPI1}')";
-            if ($mysqli->query($query)) {
+            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('1', '{$request->get("cuiPadre")}', '{$DPICreado}')";
+            if ($mysqli->query($insert)) {
                 $salida['status'] = "1";
                 $salida['mensaje'] = "OK";
             } else {
-                $salida['mensaje'] .= " error INSERT " . $mysqli->error . "|" . $query . "|";
+                $salida['mensaje'] .= " error INSERT cuiPadre" . $mysqli->error . "|" . $query . "|";
             }
         }
         if ($request->get("cuiMadre")!= "") {
-            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('2', '{$request->get("cuiMadre")}', '{$ultimoDPI1}')";
-            if ($mysqli->query($query)) {
+            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('2', '{$request->get("cuiMadre")}', '{$DPICreado}')";
+            if ($mysqli->query($insert)) {
                 $salida['status'] = "1";
                 $salida['mensaje'] = "OK";
             } else {
-                $salida['mensaje'] .= " error INSERT " . $mysqli->error . "|" . $query . "|";
+                $salida['mensaje'] .= " error INSERT cuiMadre" . $mysqli->error . "|" . $query . "|";
             }
         }
 
