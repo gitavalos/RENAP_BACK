@@ -57,7 +57,10 @@ class LugarController extends BaseController
 
                         $salida['status'] = "1";
                         $salida['mensaje'] = "OK";
-                        $salida['data'] = $departamentos;
+
+                        $listaDeptos = array();
+                        $listaDeptos['listaDepartamentos'] = $departamentos;
+                        $salida['data'] = $listaDeptos;
                     }
                 } else {
                     $salida['mensaje'] = "error de consulta";
@@ -115,7 +118,10 @@ class LugarController extends BaseController
 
                         $salida['status'] = "1";
                         $salida['mensaje'] = "OK";
-                        $salida['data'] = $departamentos;
+                        
+                        $listaDeptos = array();
+                        $listaDeptos['listaDepartamentos'] = $departamentos;
+                        $salida['data'] = $listaDeptos;
                     }
                 } else {
                     $salida['mensaje'] = "error de consulta";
