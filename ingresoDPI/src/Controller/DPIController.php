@@ -272,8 +272,9 @@ class DPIController extends AbstractController {
         $originalDate = $request->get("fechaNacimiento");
         $fecha = date("Y/m/d", strtotime($originalDate));
 
-        $ultimoDPI = substr($ultimoDPI, 0, -5);
-        $DPICreado = $this->generarDpi(intval($ultimoDPI) + 1) . $request->get("lugarNacimiento");
+        $dpiCortado = substr($ultimoDPI, 0, -5);
+        $lugarNacimiento = (strlen($request->get("lugarNacimiento")) > 3) ? $request->get("lugarNacimiento") : "0" . $request->get("lugarNacimiento");
+        $DPICreado = $this->generarDpi(intval($dpiCortado) + 1) . $lugarNacimiento;
         $query = "INSERT INTO persona 
             (`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`
             , `fechaVencimiento`, `lugarVecindad`,`direccion`, `estadoCivil`) 
