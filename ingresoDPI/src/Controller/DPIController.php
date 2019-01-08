@@ -272,6 +272,7 @@ class DPIController extends AbstractController {
         $originalDate = $request->get("fechaNacimiento");
         $fecha = date("Y/m/d", strtotime($originalDate));
 
+
         $dpiCortado = substr($ultimoDPI, 0, -5);
         $lugarNacimiento = (strlen($request->get("lugarNacimiento")) > 3) ? $request->get("lugarNacimiento") : "0" . $request->get("lugarNacimiento");
         $DPICreado = $this->generarDpi(intval($dpiCortado) + 1) . $lugarNacimiento;
@@ -289,12 +290,15 @@ class DPIController extends AbstractController {
                 . ", '{$request->get("lugarNacimiento")}'"
                 . ", '{$request->get("direccion")}'"
                 . ", 'SOLTERO')";
+
+
         if ($mysqli->query($query)) {
             $salida['status'] = "1";
             $salida['mensaje'] = "OK";
         } else {
             $salida['mensaje'] .= " error INSERT PERSONA" . $mysqli->error . "|" . $query . "|";
         }
+
 
         if ($request->get("cuiPadre") != "") {
             $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('1', '{$request->get("cuiPadre")}', '{$DPICreado}')";
@@ -305,7 +309,7 @@ class DPIController extends AbstractController {
                 $salida['mensaje'] .= " error INSERT cuiPadre" . $mysqli->error . "|" . $query . "|";
             }
         }
-        if ($request->get("cuiMadre")!= "") {
+        if ($request->get("cuiMadre") != "") {
             $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('2', '{$request->get("cuiMadre")}', '{$DPICreado}')";
             if ($mysqli->query($insert)) {
                 $salida['status'] = "1";
