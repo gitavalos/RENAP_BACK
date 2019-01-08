@@ -30,7 +30,7 @@ class LugarController extends BaseController
 
         $jsonContent = json_decode($content);
 
-        $pais = $jsonContent->pais;
+        $pais = $jsonContent->idPais;
         
         //$pais = $request->request->get('pais');
         if(isset($pais) ){
@@ -91,7 +91,7 @@ class LugarController extends BaseController
 
         $jsonContent = json_decode($content);
 
-        $departamento = $jsonContent->departamento;
+        $departamento = $jsonContent->idDepartamento;
         
         //$departamento = $request->request->get('departamento');
         if(isset($departamento) ){
@@ -120,7 +120,7 @@ class LugarController extends BaseController
                         $salida['mensaje'] = "OK";
                         
                         $listaDeptos = array();
-                        $listaDeptos['listaDepartamentos'] = $departamentos;
+                        $listaDeptos['listaMunicipios'] = $departamentos;
                         $salida['data'] = $listaDeptos;
                     }
                 } else {
