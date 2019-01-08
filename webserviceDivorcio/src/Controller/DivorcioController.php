@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
 
 
 class DivorcioController extends BaseController
@@ -16,6 +18,14 @@ class DivorcioController extends BaseController
     */
     public function postDivorcio(Request $request)
     {
+        $content = $request->getContent();
+
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+
         /*
             cuiHombre
             cuiMujer
@@ -23,11 +33,11 @@ class DivorcioController extends BaseController
             lugarDivorcio
             fechaDivorcio
         */
-        $cuiHombre = $request->request->get('cuiHombre');
-        $cuiMujer = $request->request->get('cuiMujer');
-        $municipio = $request->request->get('municipio');
-        $lugarDivorcio = $request->request->get('lugarDivorcio');
-        $fechaDivorcio = $request->request->get('fechaDivorcio');
+        $cuiHombre = $jsonContent->cuiHombre;
+        $cuiMujer = $jsonContent->cuiMujer;
+        $municipio = $jsonContent->municipio;
+        $lugarDivorcio = $jsonContent->lugarDivorcio;
+        $fechaDivorcio = $jsonContent->fechaDivorcio;
 
          
         $result = $this->registroDivorcio($cuiHombre, $cuiMujer, $municipio, $lugarDivorcio, $fechaDivorcio);
@@ -76,8 +86,16 @@ class DivorcioController extends BaseController
     */
     public function wsConsultarDivorcio(Request $request)
     {
-        $cuiHombre = $request->request->get('cuiHombre');
-        $cuiMujer = $request->request->get('cuiMujer');
+        $content = $request->getContent();
+
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+
+        $cuiHombre = $jsonContent->cuiHombre;
+        $cuiMujer = $jsonContent->cuiMujer;
 
         $result = $this->consultarDivorcio($cuiHombre, $cuiMujer);
         return $this->json($result);
@@ -143,7 +161,10 @@ class DivorcioController extends BaseController
 
                 if ($mysqli->multi_query($query)) {
                     if ($resultado = $mysqli->use_result()) {
+                        $encontrado = false;
+
                         while ($fila = $resultado->fetch_row()) {
+                            $encontrado = true;
                             $divorcio = array();
 
                             $divorcio['cuiHombre'] = $fila[0];
@@ -167,9 +188,16 @@ class DivorcioController extends BaseController
                         }
                         $resultado->close();
 
-                        $salida['status'] = "1";
-                        $salida['mensaje'] = "OK";
-                        $salida['data'] = $divorcios;
+                        if($encontrado){
+                            $salida['status'] = "1";
+                            $salida['mensaje'] = "OK";
+                            $salida['data'] = $divorcios;
+                        }else{
+                            $salida['status'] = "-1";
+                            $salida['mensaje'] = "Divorcio no encontrado";
+                            $salida['data'] = $divorcios;
+                        }
+                        
                     }
                 } else {
                     $salida['mensaje'] = "error de consulta";
