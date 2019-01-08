@@ -1,0 +1,12 @@
+FROM php:latest
+RUN apt-get update 
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
+
+RUN mkdir -p /var/www
+COPY . /var/www
+RUN chmod +x /var/www/bin/console
+WORKDIR /var/www
+
+CMD php /var/www/bin/console server:run 0.0.0.0:80
+
