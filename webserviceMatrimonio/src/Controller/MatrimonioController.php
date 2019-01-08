@@ -19,7 +19,7 @@ class MatrimonioController extends BaseController
     {
         //$cui = "";
         $content = $request->getContent();
-        error_log(print_r($request, true));
+        error_log($content);
         
         if(empty($content)){
             throw new BadRequestHttpException("Content is empty");
