@@ -35,14 +35,14 @@ class DPIController extends AbstractController {
      */
     public function consultarDPI(Request $request) {
         $content = $request->getContent();
-        error_log(print_r($request, true));
+        
 
         if (empty($content)) {
             throw new BadRequestHttpException("Content is empty");
         }
 
         $jsonContent = json_decode($content);
-        error_log(print_r($jsonContent, true));
+        
 
         $cuiBuscado =  $jsonContent->cui;
         $arrResult = $this->getInfoDPI($cuiBuscado);
@@ -173,14 +173,14 @@ class DPIController extends AbstractController {
     public function actualizarDPI(Request $request) {
         
         $content = $request->getContent();
-        error_log(print_r($request, true));
+       
 
         if (empty($content)) {
             throw new BadRequestHttpException("Content is empty");
         }
 
         $jsonContent = json_decode($content);
-        error_log(print_r($jsonContent, true));
+ 
 
         $salida = array();
         $salida['status'] = "-1";
@@ -264,14 +264,13 @@ class DPIController extends AbstractController {
     public function registrarNacimiento(Request $request) {
         
         $content = $request->getContent();
-        error_log(print_r($request, true));
-
+    
         if (empty($content)) {
             throw new BadRequestHttpException("Content is empty");
         }
 
         $jsonContent = json_decode($content);
-        error_log(print_r($jsonContent, true));
+
         
         $salida = array();
         $salida['status'] = "-1";
@@ -399,14 +398,14 @@ class DPIController extends AbstractController {
     public function getMunicipios(Request $request) {
         
          $content = $request->getContent();
-        error_log(print_r($request, true));
+        
 
         if (empty($content)) {
             throw new BadRequestHttpException("Content is empty");
         }
 
         $jsonContent = json_decode($content);
-        error_log(print_r($jsonContent, true));
+
         
         $salida = array();
         $salida['status'] = "-1";
