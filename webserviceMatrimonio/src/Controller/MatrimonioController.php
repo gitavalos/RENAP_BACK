@@ -11,13 +11,41 @@ use Symfony\Component\Routing\Annotation\Route;
 class MatrimonioController extends BaseController
 {
 
+
     /**
     * @Route("/sa/imprimirmatrimonio", name="geMatrimonio", methods="POST")
     */
     public function geMatrimonio(Request $request)
     {
+        $cui = "";
+        $content = $request->getContent();
+        error_log($content);
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+        error_log(print_r($jsonContent,true ));
+        $cuiHombre = $jsonContent->cuiHombre;
+        $cuiMujer = $jsonContent->cuiMujer;
+
+        if(!isset($cui)){
+            $cui = $cuiHombre;
+            if(!isset($cui)){
+                $cui = $cuiMujer;
+            }
+        }
+
+        return $this->json($this->selectMatrimonio($cui));
+    }
+
+    /**
+    * @Route("/sa/imprimirmatrimonioA", name="geMatrimonioA", methods="POST")
+    */
+    public function geMatrimonioA(Request $request)
+    {
         
-        
+        error_log(print_r($request->request, true));
         $cui = $request->request->get('cui');
         if(!isset($cui)){
             $cui = $request->request->get('cuihombre');
@@ -78,24 +106,24 @@ class MatrimonioController extends BaseController
                         $matrimonio = array();
                         while ($fila = $resultado->fetch_row()) {
                             $tipo = array();
-                            $tipo['cuihombre'] = $fila[0];
-                            $tipo['nombrehombre'] = $fila[1];
-                            $tipo['apellidohombre'] = $fila[2];
-                            $tipo['paishombre'] = $fila[3];
-                            $tipo['departamentohombre'] = $fila[4];
-                            $tipo['municipiohombre'] = $fila[5];
-                            $tipo['cuimujer'] = $fila[6];
-                            $tipo['nombremujer'] = $fila[7];
-                            $tipo['apellidomujer'] = $fila[8];
-                            $tipo['paismujer'] = $fila[9];
-                            $tipo['departamentomujer'] = $fila[10];
-                            $tipo['municipiomujer'] = $fila[11];
-                            $tipo['paismatrimonio'] = $fila[12];
-                            $tipo['departamentomatrimonio'] = $fila[13];
-                            $tipo['municipiomatrimonio'] = $fila[14];
-                            $tipo['lugarmatrimonio'] = $fila[15];
-                            $tipo['fechamatrimonio'] = $fila[16];
-                            $tipo['regimenmatrimonial'] = $fila[17];
+                            $tipo['cuiHombre'] = $fila[0];
+                            $tipo['nombreHombre'] = $fila[1];
+                            $tipo['apellidoHombre'] = $fila[2];
+                            $tipo['paisHombre'] = $fila[3];
+                            $tipo['departamentoHombre'] = $fila[4];
+                            $tipo['municipioHombre'] = $fila[5];
+                            $tipo['cuiMujer'] = $fila[6];
+                            $tipo['nombreMujer'] = $fila[7];
+                            $tipo['apellidoMujer'] = $fila[8];
+                            $tipo['paisMujer'] = $fila[9];
+                            $tipo['departamentoMujer'] = $fila[10];
+                            $tipo['municipioMujer'] = $fila[11];
+                            $tipo['paisMatrimonio'] = $fila[12];
+                            $tipo['departamentoMatrimonio'] = $fila[13];
+                            $tipo['municipioMatrimonio'] = $fila[14];
+                            $tipo['lugarMatrimonio'] = $fila[15];
+                            $tipo['fechaMatrimonio'] = $fila[16];
+                            $tipo['regimenMatrimonial'] = $fila[17];
 
                             array_push($matrimonio, $tipo);
                         }
@@ -123,6 +151,33 @@ class MatrimonioController extends BaseController
     * @Route("/sa/registrarmatrimonio", name="registrarMatrimonio", methods="POST")
     */
     public function registrarMatrimonio(Request $request)
+    {  
+        $content = $request->getContent();
+        error_log($content);
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+        error_log(print_r($jsonContent,true ));
+        $cuiHombre = $jsonContent->cuiHombre;
+        $cuiMujer = $jsonContent->cuiMujer;
+        $municipio = $jsonContent->municipio;
+        $lugarMatrimonio = $jsonContent->lugarMatrimonio;
+        $regimenMatrimonial = $jsonContent->regimenMatrimonial;
+        $fechaMatrimonio = $jsonContent->fechaMatrimonio;
+
+        $salida = $this->insertarMatrimonio($cuiHombre, $cuiMujer, $municipio, $lugarMatrimonio, $fechaMatrimonio, $regimenMatrimonial);
+
+
+        return $this->json($salida);
+    }
+
+
+    /**
+    * @Route("/sa/registrarmatrimonioA", name="registrarMatrimonioA", methods="POST")
+    */
+    public function registrarMatrimonioA(Request $request)
     {    
         $cuiHombre = $request->request->get('cuihombre');
         $cuiMujer = $request->request->get('cuimujer');
