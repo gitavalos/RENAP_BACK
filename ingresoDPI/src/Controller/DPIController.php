@@ -34,9 +34,19 @@ class DPIController extends AbstractController {
      * @Route("/consultarDPI", name="consultarDPI")
      */
     public function consultarDPI(Request $request) {
-        $cuiBuscado = $fila = $request->get("cui");
+        $content = $request->getContent();
+        error_log(print_r($request, true));
+
+        if (empty($content)) {
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+        error_log(print_r($jsonContent, true));
+
+        $cuiBuscado =  $jsonContent->cui;
         $arrResult = $this->getInfoDPI($cuiBuscado);
-        if (!$request->isMethod('get')) {
+        if (!$request->isMethod('post')) {
             $arrResult = array();
             $arrResult['status'] = "-1";
             $arrResult['mensaje'] = "fail";
@@ -106,7 +116,7 @@ class DPIController extends AbstractController {
             } else {
                 $salida['mensaje'] = "error de consulta";
             }
-			$queryPadres = "select pa.cuiPadre, p.nombre, p.apellido,p.fechaNacimiento,pais.nombre as Pais,departamento.nombre as departamento, municipio.nombre as municipio ,pa.idtipo_padre
+            $queryPadres = "select pa.cuiPadre, p.nombre, p.apellido,p.fechaNacimiento,pais.nombre as Pais,departamento.nombre as departamento, municipio.nombre as municipio ,pa.idtipo_padre
 							from lugar pais
 								left join lugar departamento
 								on pais.idlugar= departamento.padre
@@ -119,29 +129,28 @@ class DPIController extends AbstractController {
 								where
 								pa.hijo = '{$cond}'
 							";
-							
-			if ($mysqli->multi_query($queryPadres)) {
+
+            if ($mysqli->multi_query($queryPadres)) {
                 if ($resultado = $mysqli->use_result()) {
                     while ($fila = $resultado->fetch_row()) {
-						
-						if($fila[7] == 1){
-							$data['cuiPadre'] = $fila[0];
-							$data['nombrePadre'] = $fila[1];
-							$data['apellidoPadre'] = $fila[2];
-							$data['fechaNacimientoPadre'] = $fila[3];
-							$data['paisPadre'] = $fila[4];
-							$data['departamentoPadre'] = $fila[5];
-							$data['municipioPadre'] = $fila[6];
-						}else if($fila[7] == 2){
-							$data['cuiMadre'] = $fila[0];
-							$data['nombreMadre'] = $fila[1];
-							$data['apellidoMadre'] = $fila[2];
-							$data['fechaNacimientoMadre'] = $fila[3];
-							$data['paisMadre'] = $fila[4];
-							$data['departamentoMadre'] = $fila[5];
-							$data['municipioMadre'] = $fila[6];
-						}
-                        
+
+                        if ($fila[7] == 1) {
+                            $data['cuiPadre'] = $fila[0];
+                            $data['nombrePadre'] = $fila[1];
+                            $data['apellidoPadre'] = $fila[2];
+                            $data['fechaNacimientoPadre'] = $fila[3];
+                            $data['paisPadre'] = $fila[4];
+                            $data['departamentoPadre'] = $fila[5];
+                            $data['municipioPadre'] = $fila[6];
+                        } else if ($fila[7] == 2) {
+                            $data['cuiMadre'] = $fila[0];
+                            $data['nombreMadre'] = $fila[1];
+                            $data['apellidoMadre'] = $fila[2];
+                            $data['fechaNacimientoMadre'] = $fila[3];
+                            $data['paisMadre'] = $fila[4];
+                            $data['departamentoMadre'] = $fila[5];
+                            $data['municipioMadre'] = $fila[6];
+                        }
                     }
                     $resultado->close();
 
@@ -151,8 +160,8 @@ class DPIController extends AbstractController {
                 }
             } else {
                 $salida['mensaje'] = "error de consulta";
-            }				
-			
+            }
+
             $mysqli->close();
         }
         return $salida;
@@ -162,7 +171,16 @@ class DPIController extends AbstractController {
      * @Route("/actualizarDPI", name="actualizarDPI")
      */
     public function actualizarDPI(Request $request) {
+        
+        $content = $request->getContent();
+        error_log(print_r($request, true));
 
+        if (empty($content)) {
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+        error_log(print_r($jsonContent, true));
 
         $salida = array();
         $salida['status'] = "-1";
@@ -170,12 +188,12 @@ class DPIController extends AbstractController {
 
         if ($request->isMethod('POST')) {
             $persona = array();
-            $persona['cui'] = $request->get("cui");
-            $persona['pais'] = $request->get("pais");
-            $persona['departamento'] = $request->get("departamento");
-            $persona['municipio'] = $request->get("municipio");
-            $persona['huella'] = $request->get("huella");
-            $persona['residencia'] = $request->get("residencia");
+            $persona['cui'] = $jsonContent->cui;
+            $persona['pais'] = $jsonContent->pais;
+            $persona['departamento'] = $jsonContent->departamento;
+            $persona['municipio'] = $jsonContent->municipio;
+            $persona['huella'] = $jsonContent->huella;
+            $persona['residencia'] = $jsonContent->residencia;
             $salida = $this->updateDPI($persona);
         }
         return $this->json($salida);
@@ -244,6 +262,17 @@ class DPIController extends AbstractController {
      * @Route("/registrarNacimiento", name="registrarNacimiento")
      */
     public function registrarNacimiento(Request $request) {
+        
+        $content = $request->getContent();
+        error_log(print_r($request, true));
+
+        if (empty($content)) {
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+        error_log(print_r($jsonContent, true));
+        
         $salida = array();
         $salida['status'] = "-1";
         $salida['mensaje'] = "fail";
@@ -269,26 +298,26 @@ class DPIController extends AbstractController {
             return $this->json($salida);
         }
 
-        $originalDate = $request->get("fechaNacimiento");
+        $originalDate = $jsonContent->get("fechaNacimiento");
         $fecha = date("Y/m/d", strtotime($originalDate));
 
 
         $dpiCortado = substr($ultimoDPI, 0, -5);
-        $lugarNacimiento = (strlen($request->get("lugarNacimiento")) > 3) ? $request->get("lugarNacimiento") : "0" . $request->get("lugarNacimiento");
+        $lugarNacimiento = (strlen($jsonContent->get("lugarNacimiento")) > 3) ? $jsonContent->get("lugarNacimiento") : "0" . $jsonContent->get("lugarNacimiento");
         $DPICreado = $this->generarDpi(intval($dpiCortado) + 1) . $lugarNacimiento;
         $query = "INSERT INTO persona 
             (`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`
             , `fechaVencimiento`, `lugarVecindad`,`direccion`, `estadoCivil`) 
             VALUES ('{$DPICreado}'"
-                . ", '{$request->get("nombre")}'"
-                . ", '{$request->get("apellido")}'"
+                . ", '{$jsonContent->nombre}'"
+                . ", '{$jsonContent->apellido}'"
                 . ", '{$fecha}'"
-                . ", '{$request->get("genero")}'"
-                . ", '{$request->get("lugarNacimiento")}'"
+                . ", '{$jsonContent->genero}'"
+                . ", '{$jsonContent->lugarNacimiento}'"
                 . ", NULL"
                 . ", NULL"
-                . ", '{$request->get("lugarNacimiento")}'"
-                . ", '{$request->get("direccion")}'"
+                . ", '{$jsonContent->lugarNacimiento}'"
+                . ", '{$jsonContent->direccion}'"
                 . ", 'SOLTERO')";
 
 
@@ -300,8 +329,8 @@ class DPIController extends AbstractController {
         }
 
 
-        if ($request->get("cuiPadre") != "") {
-            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('1', '{$request->get("cuiPadre")}', '{$DPICreado}')";
+        if ($jsonContent->cuiPadre != "") {
+            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('1', '{$jsonContent->cuiPadre}', '{$DPICreado}')";
             if ($mysqli->query($insert)) {
                 $salida['status'] = "1";
                 $salida['mensaje'] = "OK";
@@ -309,8 +338,8 @@ class DPIController extends AbstractController {
                 $salida['mensaje'] .= " error INSERT cuiPadre" . $mysqli->error . "|" . $query . "|";
             }
         }
-        if ($request->get("cuiMadre") != "") {
-            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('2', '{$request->get("cuiMadre")}', '{$DPICreado}')";
+        if ($jsonContent->cuiMadre != "") {
+            $insert = "INSERT INTO `padre` (`idtipo_padre`, `cuiPadre`, `hijo`) VALUES ('2', '{$jsonContent->cuiMadre}', '{$DPICreado}')";
             if ($mysqli->query($insert)) {
                 $salida['status'] = "1";
                 $salida['mensaje'] = "OK";
@@ -368,6 +397,17 @@ class DPIController extends AbstractController {
      * @Route("/getMunicipios", name="getMunicipios")
      */
     public function getMunicipios(Request $request) {
+        
+         $content = $request->getContent();
+        error_log(print_r($request, true));
+
+        if (empty($content)) {
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+        error_log(print_r($jsonContent, true));
+        
         $salida = array();
         $salida['status'] = "-1";
         $salida['mensaje'] = "fail";
@@ -379,7 +419,7 @@ class DPIController extends AbstractController {
         if ($mysqli->connect_errno) {
             $salida['mensaje'] = "error de conexion";
         } else {
-            $consulta = "select * from lugar where padre = {$request->get("departamento")}";
+            $consulta = "select * from lugar where padre = {$jsonContent->departamento}";
             if ($mysqli->multi_query($consulta)) {
                 if ($resultado = $mysqli->use_result()) {
                     while ($fila = $resultado->fetch_row()) {
