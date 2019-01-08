@@ -31,10 +31,10 @@ class RegistroDefuncionController extends BaseController
         $lugarDefuncion = $jsonContent->lugarDefuncion;
         $fechaDefuncion = $jsonContent->fechaDefuncion;
         $causa = $jsonContent->causa;
-
-         
+        
         $result = $this->registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa);
         return $this->json($result);
+    
     }
 
     public function registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, 
@@ -87,6 +87,8 @@ class RegistroDefuncionController extends BaseController
     public function wsConsultarDefuncion(Request $request)
     {
         $content = $request->getContent();
+
+        error_log($content);
 
         if(empty($content)){
             throw new BadRequestHttpException("Content is empty");
