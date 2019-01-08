@@ -12,13 +12,20 @@ class MatrimonioController extends BaseController
 {
 
     /**
-    * @Route("/sa/matrimonio", name="geMatrimonio", methods="POST")
+    * @Route("/sa/imprimirmatrimonio", name="geMatrimonio", methods="POST")
     */
     public function geMatrimonio(Request $request)
     {
         
         
         $cui = $request->request->get('cui');
+        if(!isset($cui)){
+            $cui = $request->request->get('cuihombre');
+            if(!isset($cui)){
+                $cui = $request->request->get('cuimujer');
+            }
+        }
+
         return $this->json($this->selectMatrimonio($cui));
     }
     public function selectMatrimonio($cui){
