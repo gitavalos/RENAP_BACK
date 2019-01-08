@@ -49,8 +49,8 @@ class LugarController extends BaseController
                     if ($resultado = $mysqli->use_result()) {
                         while ($fila = $resultado->fetch_row()) {
                             $tipo = array();
-                            $tipo['codigo'] = $fila[0];
-                            $tipo['nombre'] = $fila[1];
+                            $tipo['idDepartamento'] = $fila[0];
+                            $tipo['departamento'] = $fila[1];
                             array_push($departamentos, $tipo);
                         }
                         $resultado->close();
@@ -110,8 +110,8 @@ class LugarController extends BaseController
                     if ($resultado = $mysqli->use_result()) {
                         while ($fila = $resultado->fetch_row()) {
                             $tipo = array();
-                            $tipo['codigo'] = $fila[0];
-                            $tipo['nombre'] = $fila[1];
+                            $tipo['idMunicipio'] = $fila[0];
+                            $tipo['municipio'] = $fila[1];
                             array_push($departamentos, $tipo);
                         }
                         $resultado->close();
