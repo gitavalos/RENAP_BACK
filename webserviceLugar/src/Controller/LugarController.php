@@ -21,7 +21,18 @@ class LugarController extends BaseController
         $salida['mensaje'] = "fail";
         $salida['data'] = array();
         $departamentos = array();
-        $pais = $request->request->get('pais');
+        
+        $content = $request->getContent();
+
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+
+        $pais = $jsonContent->pais;
+        
+        //$pais = $request->request->get('pais');
         if(isset($pais) ){
             $mysqli = $this->getConexion();
             if ($mysqli->connect_errno) {
@@ -68,7 +79,18 @@ class LugarController extends BaseController
         $salida['mensaje'] = "fail";
         $salida['data'] = array();
         $departamentos = array();
-        $departamento = $request->request->get('departamento');
+        
+        $content = $request->getContent();
+
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+
+        $departamento = $jsonContent->departamento;
+        
+        //$departamento = $request->request->get('departamento');
         if(isset($departamento) ){
             $mysqli = $this->getConexion();
             if ($mysqli->connect_errno) {
