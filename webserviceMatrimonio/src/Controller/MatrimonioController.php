@@ -127,7 +127,7 @@ class MatrimonioController extends BaseController
                             $tipo['fechaMatrimonio'] = $fila[16];
                             $tipo['regimenMatrimonial'] = $fila[17];
 
-                            array_push($matrimonio, $tipo);
+                            $matrimonio = $tipo;
                         }
                         $resultado->close();
                         if( count($matrimonio) > 0){
