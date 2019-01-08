@@ -130,7 +130,7 @@ class MatrimonioController extends BaseController
                             $matrimonio = $tipo;
                         }
                         $resultado->close();
-                        if( count($matrimonio) > 0){
+                        if( isset($matrimonio)){
                             $salida['status'] = "1";
                             $salida['mensaje'] = "OK";
                             $salida['data'] = $matrimonio;
