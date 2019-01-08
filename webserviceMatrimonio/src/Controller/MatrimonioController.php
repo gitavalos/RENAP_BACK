@@ -19,7 +19,8 @@ class MatrimonioController extends BaseController
     {
         //$cui = "";
         $content = $request->getContent();
-        error_log($content);
+        error_log(print_r($request, true));
+        
         if(empty($content)){
             throw new BadRequestHttpException("Content is empty");
         }
@@ -40,7 +41,7 @@ class MatrimonioController extends BaseController
     }
 
     /**
-    * @Route("/sa/imprimirmatrimonioA", name="geMatrimonioA", methods="POST")
+    * @Route("/sa/imprimirmatrimonioA", name="geMatrimonioA")
     */
     public function geMatrimonioA(Request $request)
     {
