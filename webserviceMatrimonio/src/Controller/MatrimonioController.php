@@ -17,7 +17,7 @@ class MatrimonioController extends BaseController
     */
     public function geMatrimonio(Request $request)
     {
-        $cui = "";
+        //$cui = "";
         $content = $request->getContent();
         error_log($content);
         if(empty($content)){
@@ -101,6 +101,7 @@ class MatrimonioController extends BaseController
                 " where mat.cuiHombre = '" . $cui . "' " . 
                 " or mat.cuiMujer = '" . $cui . "' " . 
                 ";";
+                error_log($query);
                 if ($mysqli->multi_query($query )) {
                     if ($resultado = $mysqli->use_result()) {
                         $matrimonio = array();
