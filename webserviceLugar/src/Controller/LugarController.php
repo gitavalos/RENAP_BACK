@@ -23,7 +23,7 @@ class LugarController extends BaseController
         $departamentos = array();
         
         $content = $request->getContent();
-
+        error_log($content);
         if(empty($content)){
             throw new BadRequestHttpException("Content is empty");
         }
@@ -84,7 +84,7 @@ class LugarController extends BaseController
         $departamentos = array();
         
         $content = $request->getContent();
-
+        error_log($content);
         if(empty($content)){
             throw new BadRequestHttpException("Content is empty");
         }
