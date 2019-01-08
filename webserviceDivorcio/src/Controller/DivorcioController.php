@@ -51,6 +51,7 @@ class DivorcioController extends BaseController
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
         $salida['data'] = null;
+        
 
         if(isset($cuiHombre, $cuiMujer, $municipio, $lugarDivorcio, $fechaDivorcio) ){
             $mysqli = $this->getConexion();
