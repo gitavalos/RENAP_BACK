@@ -50,6 +50,7 @@ class DivorcioController extends BaseController
         $salida = array();
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
+        $salida['data'] = null;
 
         if(isset($cuiHombre, $cuiMujer, $municipio, $lugarDivorcio, $fechaDivorcio) ){
             $mysqli = $this->getConexion();
@@ -106,7 +107,7 @@ class DivorcioController extends BaseController
         $salida = array();
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
-        $salida['data'] = array();
+        $salida['data'] = null;
         $divorcios = array();
 
         if(isset($cuiHombre, $cuiMujer) ){
@@ -191,11 +192,11 @@ class DivorcioController extends BaseController
                         if($encontrado){
                             $salida['status'] = "1";
                             $salida['mensaje'] = "OK";
-                            $salida['data'] = $divorcios;
+                            $salida['data'] = $divorcios[0];
                         }else{
                             $salida['status'] = "-1";
                             $salida['mensaje'] = "Divorcio no encontrado";
-                            $salida['data'] = $divorcios;
+                            $salida['data'] = null;
                         }
                         
                     }
