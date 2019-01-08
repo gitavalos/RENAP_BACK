@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 
 class RegistroDefuncionController extends BaseController
@@ -16,12 +17,20 @@ class RegistroDefuncionController extends BaseController
     */
     public function postDefuncion(Request $request)
     {
-        $cui = $request->request->get('cui');
-        $cuiCompareciente = $request->request->get('cuiCompareciente');
-        $municipio = $request->request->get('municipio');
-        $lugarDefuncion = $request->request->get('lugarDefuncion');
-        $fechaDefuncion = $request->request->get('fechaDefuncion');
-        $causa = $request->request->get('causa');
+        $content = $request->getContent();
+
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+
+        $cui = $jsonContent->cui;
+        $cuiCompareciente = $jsonContent->cuiCompareciente;
+        $municipio = $jsonContent->municipio;
+        $lugarDefuncion = $jsonContent->lugarDefuncion;
+        $fechaDefuncion = $jsonContent->fechaDefuncion;
+        $causa = $jsonContent->causa;
 
          
         $result = $this->registroDefuncion($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa);
@@ -35,6 +44,7 @@ class RegistroDefuncionController extends BaseController
         $salida = array();
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
+        $salida['data'] = null;
 
         if(isset($cui, $cuiCompareciente, $municipio, $lugarDefuncion, $fechaDefuncion, $causa) ){
             $mysqli = $this->getConexion();
@@ -76,7 +86,16 @@ class RegistroDefuncionController extends BaseController
     */
     public function wsConsultarDefuncion(Request $request)
     {
-        $cui = $request->request->get('cui');
+        $content = $request->getContent();
+
+        if(empty($content)){
+            throw new BadRequestHttpException("Content is empty");
+        }
+
+        $jsonContent = json_decode($content);
+
+        $cui = $jsonContent->cui;
+
         $result = $this->consultarDefuncion($cui);
         return $this->json($result);
     }
@@ -86,7 +105,7 @@ class RegistroDefuncionController extends BaseController
         $salida = array();
 		$salida['status'] = "-1";
         $salida['mensaje'] = "fail";
-        $salida['data'] = array();
+        $salida['data'] = null;
         $defunciones = array();
 
         if(isset($cui) ){
@@ -150,7 +169,11 @@ class RegistroDefuncionController extends BaseController
 
                 if ($mysqli->multi_query($query)) {
                     if ($resultado = $mysqli->use_result()) {
+                        $encontrado = false;
+
                         while ($fila = $resultado->fetch_row()) {
+                            $encontrado = true;
+
                             $defuncion = array();
                             $defuncion['cui'] = $fila[0];
                             $defuncion['nombre'] = $fila[1];
@@ -181,9 +204,15 @@ class RegistroDefuncionController extends BaseController
                         }
                         $resultado->close();
 
-                        $salida['status'] = "1";
-                        $salida['mensaje'] = "OK";
-                        $salida['data'] = $defunciones;
+                        if($encontrado){
+                            $salida['status'] = "1";
+                            $salida['mensaje'] = "OK";
+                            $salida['data'] = $defunciones[0];
+                        }else{
+                            $salida['status'] = "-1";
+                            $salida['mensaje'] = "Defunción no encontrada";
+                            $salida['data'] = null;
+                        }
                     }
                 } else {
                     $salida['mensaje'] = "error de consulta";
