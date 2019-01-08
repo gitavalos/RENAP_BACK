@@ -297,12 +297,12 @@ class DPIController extends AbstractController {
             return $this->json($salida);
         }
 
-        $originalDate = $jsonContent->get("fechaNacimiento");
+        $originalDate = $jsonContent->fechaNacimiento;
         $fecha = date("Y/m/d", strtotime($originalDate));
 
 
         $dpiCortado = substr($ultimoDPI, 0, -5);
-        $lugarNacimiento = (strlen($jsonContent->get("lugarNacimiento")) > 3) ? $jsonContent->get("lugarNacimiento") : "0" . $jsonContent->get("lugarNacimiento");
+        $lugarNacimiento = (strlen($jsonContent->lugarNacimiento) > 3) ? $jsonContent->lugarNacimiento : "0" . $jsonContent->lugarNacimiento;
         $DPICreado = $this->generarDpi(intval($dpiCortado) + 1) . $lugarNacimiento;
         $query = "INSERT INTO persona 
             (`cui`, `nombre`, `apellido`, `fechaNacimiento`, `genero`, `lugarNacimiento`, `huella`
